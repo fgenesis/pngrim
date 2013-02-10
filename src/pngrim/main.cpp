@@ -143,6 +143,7 @@ void processFile(const char *fn)
 
 	printf("Processing %s ... ", fn);
 	processImage(img);
+	printf("saving ... ");
 
 	if(img.writePNG(fn))
 		printf("OK\n");
@@ -156,6 +157,7 @@ int main(int argc, char **argv)
 	if(argc <= 1)
 	{
 		printf("Usage: ./pngrim file1.png [fileX.png ...]\n");
+		printf("Warning: Modifies files in place!\n");
 		return 2;
 	}
 

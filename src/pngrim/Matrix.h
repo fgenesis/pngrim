@@ -13,7 +13,6 @@ private:
 	size_t _shift;
 	size_t _w;
 	size_t _h;
-	size_t _elems;
 
 public:
 	Matrix() : _mem(NULL), _shift(0), _w(0), _h(0) {}
@@ -50,14 +49,11 @@ public:
 			newsize <<= 1;
 			++sh;
 		}
-
 		_shift = sh;
 
 		if(_mem)
 			delete [] _mem;
-
-		_elems = newsize * _h;
-		_mem = new T[_elems];
+		_mem = new T[newsize * _h];
 	}
 
 	inline T& operator()(size_t x, size_t y)

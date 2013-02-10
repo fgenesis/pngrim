@@ -23,10 +23,6 @@
 
 #include "ImagePNG.h"
 
-#include <string>
-#include <fstream>
-#include <assert.h>
-
 #include <png.h>
 
 //////////////////////////////////////////////////////////////////////////
@@ -37,38 +33,11 @@ Image::Image(unsigned int _width, unsigned int _height)
 	m_bits.resize(_width * _height);
 }
 
-unsigned int& Image::operator() (unsigned int _x, unsigned int _y)
-{
-	_ASSERT(_x < m_width && _y < m_height);
-	return m_bits[_y * m_width + _x];
-}
-
-unsigned int Image::operator() (unsigned int _x, unsigned int _y) const
-{
-	_ASSERT(_x < m_width && _y < m_height);
-	return m_bits[_y * m_width + _x];
-}
-
-void Image::clear(unsigned int _color)
-{
-	for(unsigned int i = 0; i < m_width * m_height; i++)
-		m_bits[i] = _color;
-}
-
-void Image::free()
-{
-	// swap trick to really reclaim memory
-	m_bits.clear();
-	std::vector<unsigned int>().swap(m_bits);
-	m_width = m_height = 0;
-}
 
 //////////////////////////////////////////////////////////////////////////
 
 bool Image::writePNG(const char* aFileName)
 {
-	std::string _fileName(aFileName);
-
 	std::vector<png_byte> byteData (m_bits.size() * 4);
 	std::vector<png_byte>::iterator ptr = byteData.begin();
 	for(std::vector<unsigned int>::const_iterator it = m_bits.begin(); it != m_bits.end(); ++it)
@@ -85,9 +54,9 @@ bool Image::writePNG(const char* aFileName)
 		rowData[i] = i * m_width * 4 + &byteData.front();
 
 	/* create file */
-	FILE *fp = fopen(_fileName.c_str(), "wb");
+	FILE *fp = fopen(aFileName, "wb");
 	if (!fp) {
-		printf("[write_png_file] File %s could not be opened for writing\n", _fileName.c_str());
+		printf("[write_png_file] File %s could not be opened for writing\n", aFileName);
 		return false;
 	}
 
@@ -161,8 +130,6 @@ end:
 
 bool Image::readPNG(const char* aFileName)
 {
-	std::string _fileName(aFileName);
-
 	png_byte header[8];	// 8 is the maximum size that can be checked
 	std::vector<unsigned int>::iterator it;
 	std::vector<png_byte> byteData;
@@ -171,17 +138,17 @@ bool Image::readPNG(const char* aFileName)
 	png_structp png_ptr = 0;
 
 	/* open file and test for it being a png */
-	FILE *fp = fopen(_fileName.c_str(), "rb");
+	FILE *fp = fopen(aFileName, "rb");
 	if (!fp)
 	{
-		printf("[read_png_file] File %s could not be opened for reading\n", _fileName.c_str());
+		printf("[read_png_file] File %s could not be opened for reading\n", aFileName);
 		return false;
 	}
 	bool success = true;
 	fread(header, 1, 8, fp);
 	if (png_sig_cmp(header, 0, 8))
 	{
-		printf("[read_png_file] File %s is not recognized as a PNG file\n", _fileName.c_str());
+		printf("[read_png_file] File %s is not recognized as a PNG file\n", aFileName);
 		success = false;
 		goto end;
 	}
@@ -243,6 +210,15 @@ bool Image::readPNG(const char* aFileName)
 	m_bits.resize(m_width * m_height);
 	it = m_bits.begin();
 	const unsigned char channels = png_get_channels(png_ptr, info_ptr);
+
+	// FIXME: ah well.
+	if(!(channels == 3 || channels == 4))
+	{
+		printf("Unsupported channel count: %u\n", channels);
+		success = false;
+		goto end;
+	}
+
 	for(size_t y = 0; y < m_height; y++)
 	{
 		png_byte *b = rowData[y];
@@ -254,6 +230,8 @@ bool Image::readPNG(const char* aFileName)
 			v |= *b++ << 16; // B
 			if(channels == 4)
 				v |= *b++ << 24; // A
+			else
+				v |= 0xff << 24; // A
 
 			*it++ = v;
 		}
