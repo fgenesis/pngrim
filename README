@@ -1,0 +1,25 @@
+
+pngrim -- fixes white borders of PNG textures
+
+Loads a PNG file and gets rid of the white border that shows up
+if the PNG is used as a texture in OpenGL and scaled down.
+Saves as 32 bit (RGBA) PNG files.
+
+The "white border" problem is originally caused by OpenGL interpolating the
+neighboring pixels of textures, causing color mixing of the affected pixels.
+Graphics programs like photoshop tend to save erased and fully transparent
+areas as plain white with zero alpha. When color mixing is performed,
+this white shows up because it is mixed with the visible neighboring pixels
+(in both alpha and color).
+
+This program works similar to the "Solidify" filters by
+Flaming Pear Software (http://flamingpear.com), but is less sophisticated,
+faster, and much simpler to use:
+Just invoke "./pngrim *.png" and have all PNGs in the current directory fixed.
+
+It was a quick hack for me to fix white borders in game textures,
+and is not inteded to be fancy.
+There will be no visible change to the PNG, but the difference can be seen
+if the alpha channel is removed.
+
+The graphics included as an example were made by Frances Fawcett.

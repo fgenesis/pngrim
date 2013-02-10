@@ -1,4 +1,6 @@
 
+/* This code is released into the public domain. */
+
 #include <string>
 #include <stdio.h>
 #include <queue>
