@@ -137,13 +137,15 @@ void processFile(const char *fn)
 	Image img;
 	if(!img.readPNG(fn))
 	{
-		printf("Error reading image: %s\n", fn);
+		printf("File not processed: %s\n", fn);
 		return;
 	}
 
 	printf("Processing %s ... ", fn);
+	fflush(stdout);
 	processImage(img);
 	printf("saving ... ");
+	fflush(stdout);
 
 	if(img.writePNG(fn))
 		printf("OK\n");

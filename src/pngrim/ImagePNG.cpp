@@ -136,6 +136,7 @@ bool Image::readPNG(const char* aFileName)
 	std::vector<png_byte*> rowData;
 	png_infop info_ptr = 0;
 	png_structp png_ptr = 0;
+	unsigned char channels = 0;
 
 	/* open file and test for it being a png */
 	FILE *fp = fopen(aFileName, "rb");
@@ -209,14 +210,20 @@ bool Image::readPNG(const char* aFileName)
 
 	m_bits.resize(m_width * m_height);
 	it = m_bits.begin();
-	const unsigned char channels = png_get_channels(png_ptr, info_ptr);
+	channels = png_get_channels(png_ptr, info_ptr);
 
-	// FIXME: ah well.
-	if(!(channels == 3 || channels == 4))
+	switch(channels)
 	{
-		printf("Unsupported channel count: %u\n", channels);
-		success = false;
-		goto end;
+		case 4:
+			break;
+		case 3:
+			printf("File is 24 bit PNG without alpha, nothing to change.\n");
+			success = false;
+			goto end;
+		default: // FIXME: there's also 2 channel PNGs, greyscale + alpha.
+			printf("Unsupported channel count: %u\n", channels);
+			success = false;
+			goto end;
 	}
 
 	for(size_t y = 0; y < m_height; y++)
@@ -228,10 +235,10 @@ bool Image::readPNG(const char* aFileName)
 			v |= *b++; // R
 			v |= *b++ << 8; // G
 			v |= *b++ << 16; // B
-			if(channels == 4)
+			//if(channels == 4)
 				v |= *b++ << 24; // A
-			else
-				v |= 0xff << 24; // A
+			//else
+			//	v |= 0xff << 24; // A
 
 			*it++ = v;
 		}
