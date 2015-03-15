@@ -1,7 +1,7 @@
 
 /* This code is released into the public domain. */
 
-#include <string>
+#include <string.h>
 #include <stdio.h>
 #include "ImagePNG.h"
 #include "pngrim.h"
