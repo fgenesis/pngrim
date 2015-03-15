@@ -9,8 +9,8 @@
 
 struct Pos
 {
-	Pos(unsigned int xx, unsigned int yy, unsigned int n) : x(xx), y(yy), nb(n) {}
-	unsigned int x, y, nb;
+	Pos(unsigned xx, unsigned yy, unsigned n) : x(xx), y(yy), nb(n) {}
+	unsigned x, y, nb;
 
 	inline bool operator< (const Pos& p) const
 	{
@@ -18,20 +18,20 @@ struct Pos
 	}
 };
 
-inline unsigned int red  (unsigned int c) { return (c      ) & 0xff; }
-inline unsigned int green(unsigned int c) { return (c >> 8 ) & 0xff; }
-inline unsigned int blue (unsigned int c) { return (c >> 16) & 0xff; }
-inline unsigned int alpha(unsigned int c) { return (c >> 24) & 0xff; }
+inline unsigned red  (unsigned c) { return (c      ) & 0xff; }
+inline unsigned green(unsigned c) { return (c >> 8 ) & 0xff; }
+inline unsigned blue (unsigned c) { return (c >> 16) & 0xff; }
+inline unsigned alpha(unsigned c) { return (c >> 24) & 0xff; }
 
 void processImage(Image& img)
 {
-	const unsigned int w = img.width();
-	const unsigned int h = img.height();
+	const unsigned w = img.width();
+	const unsigned h = img.height();
 	Matrix<unsigned char> solid(w, h);
 	std::vector<Pos> P, Q, R;
 
-	for(unsigned int y = 0; y < h; ++y)
-		for(unsigned int x = 0; x < w; ++x)
+	for(unsigned y = 0; y < h; ++y)
+		for(unsigned x = 0; x < w; ++x)
 		{
 			if(alpha(img(x, y)))
 				solid(x, y) = 1;
@@ -42,8 +42,8 @@ void processImage(Image& img)
 				for(int oy = -1; oy <= 1; ++oy)
 					for(int ox = -1; ox <= 1; ++ox)
 					{
-						const unsigned int xn = int(x) + ox;
-						const unsigned int yn = int(y) + oy;
+						const unsigned xn = int(x) + ox;
+						const unsigned yn = int(y) + oy;
 						if(xn < w && yn < h && alpha(img(xn, yn)))
 							++p.nb;
 					}
@@ -60,30 +60,28 @@ void processImage(Image& img)
 
 		while(Q.size())
 		{
-			unsigned int r = 0;
-			unsigned int g = 0;
-			unsigned int b = 0;
-			int c = 0;
+			unsigned r = 0;
+			unsigned g = 0;
+			unsigned b = 0;
+			unsigned c = 0;
 			Pos p = Q.back();
 			Q.pop_back();
 			if(solid(p.x, p.y))
 				continue;
 
-			unsigned int a = alpha(img(p.x, p.y));
-
 			for(int oy = -1; oy <= 1; ++oy)
 			{
-				const unsigned int y = int(p.y) + oy;
+				const unsigned y = int(p.y) + oy;
 				if(y < h)
 				{
 					for(int ox = -1; ox <= 1; ++ox)
 					{
-						const unsigned int x = int(p.x) + ox;
+						const unsigned x = int(p.x) + ox;
 						if(x < w)
 						{
 							if(solid(x, y))
 							{
-								const unsigned int pix = img(x, y);
+								const unsigned pix = img(x, y);
 								r +=   red(pix);
 								g += green(pix);
 								b +=  blue(pix);
@@ -95,13 +93,14 @@ void processImage(Image& img)
 					}
 				}
 			}
+
+			const unsigned a = alpha(img(p.x, p.y));
 			solid(p.x, p.y) = 1;
-			float fc = float(c);
 			img(p.x, p.y) =
-			  ((unsigned int)(r / fc)      )
-			| ((unsigned int)(g / fc) << 8 )
-			| ((unsigned int)(b / fc) << 16)
-			| (a << 24);
+			  ((r / c)      )
+			| ((g / c) << 8 )
+			| ((b / c) << 16)
+			| ((a    ) << 24);
 		}
 
 		while(R.size())
@@ -114,8 +113,8 @@ void processImage(Image& img)
 			for(int oy = -1; oy <= 1; ++oy)
 				for(int ox = -1; ox <= 1; ++ox)
 				{
-					const unsigned int xn = int(p.x) + ox;
-					const unsigned int yn = int(p.y) + oy;
+					const unsigned xn = int(p.x) + ox;
+					const unsigned yn = int(p.y) + oy;
 					if(xn < w && yn < h && solid(xn, yn))
 						++p.nb;
 				}
