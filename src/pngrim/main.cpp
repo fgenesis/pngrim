@@ -3,7 +3,6 @@
 
 #include <string>
 #include <stdio.h>
-#include <queue>
 #include <algorithm>
 #include "ImagePNG.h"
 #include "Matrix.h"
@@ -29,8 +28,7 @@ void processImage(Image& img)
 	const unsigned int w = img.width();
 	const unsigned int h = img.height();
 	Matrix<unsigned char> solid(w, h);
-	std::vector<Pos> P, R;
-	std::queue<Pos> Q;
+	std::vector<Pos> P, Q, R;
 
 	for(unsigned int y = 0; y < h; ++y)
 		for(unsigned int x = 0; x < w; ++x)
@@ -58,11 +56,7 @@ void processImage(Image& img)
 	while(P.size())
 	{
 		std::sort(P.begin(), P.end());
-		while(P.size())
-		{
-			Q.push(P.back());
-			P.pop_back();
-		}
+		P.swap(Q);
 
 		while(Q.size())
 		{
@@ -70,8 +64,8 @@ void processImage(Image& img)
 			unsigned int g = 0;
 			unsigned int b = 0;
 			int c = 0;
-			Pos p = Q.front();
-			Q.pop();
+			Pos p = Q.back();
+			Q.pop_back();
 			if(solid(p.x, p.y))
 				continue;
 
