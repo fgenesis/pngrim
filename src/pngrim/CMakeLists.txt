@@ -4,6 +4,8 @@ ImagePNG.cpp
 ImagePNG.h
 main.cpp
 Matrix.h
+pngrim.cpp
+pngrim.h
 )
 
 if(MSVC)

@@ -198,6 +198,14 @@
 				RelativePath=".\pngrim\main.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\pngrim\pngrim.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\pngrim\pngrim.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
