@@ -25,7 +25,6 @@ void processFile(const char *fn, bool fast)
 
 	printf("Processing %s ... ", fn);
 	fflush(stdout);
-	//for(int i = 0; i < 1000; ++i)
 	processImage(img, fast);
 	printf("saving ... ");
 	fflush(stdout);

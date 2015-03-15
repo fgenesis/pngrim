@@ -78,7 +78,7 @@ void pngrimAccurate(Image& img)
 				{
 					for(int ox = -1; ox <= 1; ++ox)
 					{
-						if(oy ||ox)
+						if(oy || ox)
 						{
 							const unsigned x = int(p.x) + ox;
 							if(x < w)
@@ -134,16 +134,16 @@ void pngrimFast(Image& img)
 	const unsigned inf = 0x7fffffff;
 	Matrix<unsigned> dist(w, h);
 
-	unsigned numsolid = 0;
+	unsigned numtrans = 0;
 	for(unsigned y = 0; y < h; ++y)
 		for(unsigned x = 0; x < w; ++x)
 		{
-			const unsigned val = !alpha(img(x, y));;
-			dist(x, y) = val;
-			numsolid += val;
+			const unsigned isTrans = !alpha(img(x, y));
+			dist(x, y) = isTrans;
+			numtrans += isTrans;
 		}
 	std::vector<Pos> todo;
-	todo.reserve(numsolid);
+	todo.reserve(numtrans);
 
 	// distance transform, X direction
 	for(unsigned y = 0; y < h; ++y)
